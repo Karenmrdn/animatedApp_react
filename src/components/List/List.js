@@ -1,36 +1,45 @@
 import React, { Component } from "react";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./List.css";
 
 class List extends Component {
   state = {
-    items: [1, 2, 3],
+    items: [
+      { id: "i1", text: 1 },
+      { id: "i2", text: 2 },
+      { id: "i3", text: 3 },
+    ],
   };
 
   addItemHandler = () => {
     this.setState((prevState) => {
       return {
-        items: prevState.items.concat(prevState.items.length + 1),
+        items: prevState.items.concat({
+          id: (Math.random() + Date.now()).toString(),
+          text: prevState.items.length + 1,
+        }),
       };
     });
   };
 
-  removeItemHandler = (selIndex) => {
+  removeItemHandler = (idToDelete) => {
     this.setState((prevState) => {
       return {
-        items: prevState.items.filter((item, index) => index !== selIndex),
+        items: prevState.items.filter((item) => item.id !== idToDelete),
       };
     });
   };
 
   render() {
-    const listItems = this.state.items.map((item, index) => (
-      <li
-        key={index}
-        className="ListItem"
-        onClick={() => this.removeItemHandler(index)}
-      >
-        {item}
-      </li>
+    const listItems = this.state.items.map((item) => (
+      <CSSTransition key={item.id} timeout={300} classNames="fade">
+        <li
+          className="ListItem"
+          onClick={() => this.removeItemHandler(item.id)}
+        >
+          {item.text}
+        </li>
+      </CSSTransition>
     ));
 
     return (
@@ -39,7 +48,9 @@ class List extends Component {
           Add Item
         </button>
         <p>Click Item to Remove.</p>
-        <ul className="List">{listItems}</ul>
+        <TransitionGroup component="ul" className="List">
+          {listItems}
+        </TransitionGroup>
       </div>
     );
   }
